@@ -26,3 +26,11 @@ The easiest way to install the app on your mobile phone is by downloading the `.
 4. Open the file manager on your phone and open the `.jad` or `.jar` file to install the application.
 
 *Note: The code is written specifically using older Java 1.4 syntax and has been pre-verified using ProGuard so that it works seamlessly on devices like Sony Ericsson without throwing "VerifyError".*
+
+## Development Branch (HTTP Test)
+
+The project includes a `dev` branch specifically for testing **plain HTTP** connections (bypassing the phone's native HTTPS/TLS stack entirely).
+
+1.  Switch to the `dev` branch: `git checkout dev`
+2.  On this branch, `src/TestMIDlet.java` uses `http://` instead of `https://`.
+3.  The compiled JAR/JAD on that branch are pre-configured for this HTTP test.
