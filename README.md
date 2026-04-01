@@ -54,10 +54,3 @@ $manifest | Out-File -Encoding UTF8 releases\TestMIDlet.jad
 # 5. Cleanup
 Remove-Item -Force raw.jar
 ```
-
----
-
-## Branch Information
-
-*   **`main` branch**: Configured for **HTTPS** testing (using `https://`).
-*   **`dev` branch**: Configured for **HTTP** testing (plain connection, no SSL/TLS). Switch using `git checkout dev`.
