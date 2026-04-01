@@ -6,8 +6,10 @@ Since modern APIs and websites enforce strict, updated SSL/TLS certificates that
 
 ## How to use
 
-1.  **Download the App**: Go to the **Releases** tab and download `jme-https-test.jar` and `TestMIDlet.jad`.
-2.  **Install on Phone**: Transfer both files to your phone's storage.
+1.  **Download the App**: Go to the **Releases** tab and choose the version you want to test:
+    *   **`jme-https-test-https.zip`**: Uses native `https://`. Use this to test if your phone can handle modern SSL/TLS certificates.
+    *   **`jme-https-test-http.zip`**: Uses plain `http://`. Use this as a fallback if HTTPS is not supported by your device.
+2.  **Install on Phone**: Extract the ZIP, and transfer both the `.jar` and `.jad` files to your phone's storage.
 3.  **Run the Test**: Open the app and click "Testuj". It will attempt to connect to the pre-configured URL and display the response or the specific error code (e.g., `8000001b` for SSL handshake failure on Sony Ericsson).
 
 ---
