@@ -1,36 +1,63 @@
-# J2ME HTTPS Proxy Test
+# J2ME HTTPS Connection Test
 
-This project demonstrates a simple J2ME application (MIDlet) capable of connecting to modern websites and APIs by proxying requests through a Cloudflare Worker.
+This project is a simple J2ME application (MIDlet) used to test if a legacy mobile device (like an old Sony Ericsson) can successfully establish a direct HTTPS connection to a modern web domain.
 
-Since modern APIs and websites enforce strict, updated SSL/TLS certificates that legacy Java 2 Micro Edition (J2ME) devices (such as old Sony Ericsson phones) do not support, this tool effectively routes the connection through Cloudflare so they can connect correctly!
+Since modern APIs and websites enforce strict, updated SSL/TLS certificates that many legacy Java 2 Micro Edition (J2ME) devices do not support, this application helps diagnose whether your device can natively handle modern certificates or if it requires a proxy/bypass.
 
-## Architecture
+## How to use
 
-1. **J2ME App (`src/TestMIDlet.java`)**: Runs on the legacy phone. Sends a simple HTTP/HTTPS GET request to the Cloudflare Worker.
-2. **Cloudflare Worker (`worker.js`)**: Runs on modern Cloudflare infrastructure. Resolves the modern certificates and serves the data over a legacy-friendly connection.
+1.  **Download the App**: Go to the **Releases** tab and download `jme-https-test.jar` and `TestMIDlet.jad`.
+2.  **Install on Phone**: Transfer both files to your phone's storage.
+3.  **Run the Test**: Open the app and click "Testuj". It will attempt to connect to the pre-configured URL and display the response or the specific error code (e.g., `8000001b` for SSL handshake failure on Sony Ericsson).
 
-## How to used
+---
 
-### 1. Cloudflare Worker Deployment
-To host the proxy server yourself:
-1. Make sure Node.js is installed.
-2. Run `npx wrangler deploy` in the root folder of this project in your terminal.
-3. It will install wrangler, log you in, and automatically host your proxy worker.
+## Modifying and Building
 
-### 2. J2ME Setup (Mobile Phone)
-The easiest way to install the app on your mobile phone is by downloading the `.jar` and `.jad` files found in the **Releases** tab of this repository.
+You can clone this repository to test any domain you wish.
 
-1. Download the `jme-https-test.jar` and `TestMIDlet.jad`.
-2. Connect your legacy phone (e.g., via USB cable or Bluetooth).
-3. Transfer both files to the phone's storage.
-4. Open the file manager on your phone and open the `.jad` or `.jar` file to install the application.
+### 1. Change the Target URL
+Open [TestMIDlet.java](src/TestMIDlet.java) and modify the `url` variable on line 39:
 
-*Note: The code is written specifically using older Java 1.4 syntax and has been pre-verified using ProGuard so that it works seamlessly on devices like Sony Ericsson without throwing "VerifyError".*
+```java
+String url = "https://your-custom-domain.com/";
+```
 
-## Development Branch (HTTP Test)
+### 2. Build the Application
+Ensure you have a Java JDK installed. You don't need a heavy J2ME SDK; the build command below will download the necessary compiler tools and libraries automatically into a `.tools` folder.
 
-The project includes a `dev` branch specifically for testing **plain HTTP** connections (bypassing the phone's native HTTPS/TLS stack entirely).
+Run the following command in PowerShell from the project root:
 
-1.  Switch to the `dev` branch: `git checkout dev`
-2.  On this branch, `src/TestMIDlet.java` uses `http://` instead of `https://`.
-3.  The compiled JAR/JAD on that branch are pre-configured for this HTTP test.
+```powershell
+# 1. Setup Build Tools
+mkdir .tools -ErrorAction SilentlyContinue
+Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/eclipse/jdt/ecj/3.33.0/ecj-3.33.0.jar" -OutFile ".tools\ecj.jar"
+Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/microemu/cldcapi11/2.0.4/cldcapi11-2.0.4.jar" -OutFile ".tools\cldcapi11.jar"
+Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/microemu/midpapi20/2.0.4/midpapi20-2.0.4.jar" -OutFile ".tools\midpapi20.jar"
+Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/com/guardsquare/proguard-base/7.1.1/proguard-base-7.1.1.jar" -OutFile ".tools\proguard.jar"
+Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/com/guardsquare/proguard-core/7.1.1/proguard-core-7.1.1.jar" -OutFile ".tools\proguard-core.jar"
+
+# 2. Compile
+java -jar .tools\ecj.jar -1.4 -source 1.4 -target 1.4 -bootclasspath ".tools\cldcapi11.jar;.tools\midpapi20.jar" src\TestMIDlet.java
+
+# 3. Package and Preverify
+jar cvfm raw.jar manifest.txt -C src/ .
+java -cp ".tools\proguard.jar;.tools\proguard-core.jar" proguard.ProGuard -injars raw.jar -outjars releases\jme-https-test.jar -libraryjars ".tools\cldcapi11.jar" -libraryjars ".tools\midpapi20.jar" -dontobfuscate -dontoptimize -dontshrink -microedition -force
+
+# 4. Generate JAD
+$size = (Get-Item releases\jme-https-test.jar).Length
+$manifest = Get-Content manifest.txt
+$manifest += "MIDlet-Jar-Size: $size"
+$manifest += "MIDlet-Jar-URL: jme-https-test.jar"
+$manifest | Out-File -Encoding UTF8 releases\TestMIDlet.jad
+
+# 5. Cleanup
+Remove-Item -Force raw.jar
+```
+
+---
+
+## Branch Information
+
+*   **`main` branch**: Configured for **HTTPS** testing (using `https://`).
+*   **`dev` branch**: Configured for **HTTP** testing (plain connection, no SSL/TLS). Switch using `git checkout dev`.
