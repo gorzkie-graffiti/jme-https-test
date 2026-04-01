@@ -1,0 +1,6 @@
+MIDlet-Name: HTTPS Test
+MIDlet-Version: 1.0.0
+MIDlet-Vendor: Krystian
+MIDlet-1: HTTPS Test,,TestMIDlet
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.1
