@@ -22,6 +22,8 @@ public class TestMIDlet extends MIDlet implements CommandListener {
 
     public void commandAction(Command c, Displayable d) {
         if (c == testCmd) {
+            result.setLabel("Status:");
+            result.setText("Łączenie z proxy...");
             new Thread(new Runnable() {
                 public void run() {
                     doRequest();
@@ -46,11 +48,11 @@ public class TestMIDlet extends MIDlet implements CommandListener {
                 resp = new String(buf, 0, len);
             }
             
-            form.delete(0);
-            form.append(new StringItem("Odpowiedź:", resp));
-        } catch (Exception e) {
-            form.delete(0);
-            form.append(new StringItem("Błąd:", e.toString()));
+            result.setLabel("Odpowiedź:");
+            result.setText(resp);
+        } catch (Throwable e) {
+            result.setLabel("Błąd:");
+            result.setText(e.toString());
         } finally {
             try { if (is != null) is.close(); } catch (Exception e) {}
             try { if (conn != null) conn.close(); } catch (Exception e) {}
