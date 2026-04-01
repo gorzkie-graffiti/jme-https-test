@@ -33,11 +33,11 @@ public class TestMIDlet extends MIDlet implements CommandListener {
     }
 
     void doRequest() {
-        HttpConnection conn = null;
+        HttpsConnection conn = null;
         InputStream is = null;
         try {
-            String url = "http://jme-https-test.mateusz-pierzchala2005.workers.dev/";
-            conn = (HttpConnection) Connector.open(url);
+            String url = "https://jme-https-test.mateusz-pierzchala2005.workers.dev/";
+            conn = (HttpsConnection) Connector.open(url);
             conn.setRequestMethod(HttpConnection.GET);
             is = conn.openInputStream();
             byte[] buf = new byte[256];
